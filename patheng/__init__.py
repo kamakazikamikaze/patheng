@@ -4,4 +4,4 @@
 # from .utils import (
 #     pinghost, populatetargets, checkmakedir, generateconfig
 # )
-from . import elk, utils
+from . import elk, utils, crypto

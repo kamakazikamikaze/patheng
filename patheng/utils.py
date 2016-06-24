@@ -44,7 +44,7 @@ def checkmakedir(path):
         pass
 
 
-def generateconfig(filename, args):
+def generateconfig(filename, args, folder='./cfg'):
     """
     Generate a template configuration file in the `./cfg` folder
 
@@ -52,7 +52,7 @@ def generateconfig(filename, args):
     filename -- target destination file
     args -- a JSON of the sample configuration layout
     """
-    if not os.path.isdir('./cfg'):
-        os.mkdir('./cfg')
-    with open('./cfg/' + filename, 'w') as dc:
+    if not os.path.isdir(folder):
+        os.mkdir(folder)
+    with open(folder + filename, 'w') as dc:
         json.dump(args, dc, indent=4, sort_keys=True)
