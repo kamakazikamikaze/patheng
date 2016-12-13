@@ -13,14 +13,14 @@ def make_index(url, indexname, mapping, debug=False):
     '''
     Check for and, if necessary, create an ElasticSearch index
 
-    Keyword arguments:
-    url -- Base URL of the ElasticSearch node/cluster
-    indexname -- Name of the target ElasticSearch index
-    mapping -- Index mapping structure
+    :param url: Base URL of the ElasticSearch node/cluster
+    :param indexname: Name of the target ElasticSearch index
+    :param mapping: Index mapping structure
     '''
     check_exists = requests.get(url + indexname)
-    #check_exists = request_session.get(url + indexname)
-    if check_exists.status_code == 404:  # if the index doesn't exist MAKE IT...and set up the mapping as well!
+    # check_exists = request_session.get(url + indexname)
+    # if the index doesn't exist MAKE IT...and set up the mapping as well!
+    if check_exists.status_code == 404:
         if debug:
             print("another day, another index.")
         r = requests.put(url + indexname, data=json.dumps(mapping))
@@ -31,11 +31,11 @@ def make_index(url, indexname, mapping, debug=False):
 
 def checkservers(config, debug=False):
     '''
-    Check if destination ElasticSearch clusters are online and prepare indices for data
+    Check if destination ElasticSearch clusters are online and prepare indices
+    for data
     Allows for an optional error index
 
-    Keyword arguments:
-    config -- a dictionary of configuration arguments passed in at runtime
+    :param config: a dictionary of configuration arguments passed in at runtime
         Required key-value pairs:
         'send to' -- a dictionary of all target ES clusters
             key: cluster metadata name

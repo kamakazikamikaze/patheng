@@ -5,21 +5,47 @@ from tempfile import NamedTemporaryFile
 
 secure_modulo = [2048, 4096]
 
-ciphers = [ 'aes128', 'aes192', 'aes256', 'camellia128', 'camellia192', 'camellia256', 'des', 'des3', 'idea']
+ciphers = [
+    'aes128',
+    'aes192',
+    'aes256',
+    'camellia128',
+    'camellia192',
+    'camellia256',
+    'des',
+    'des3',
+    'idea']
 
 
 def gen_rsa(modulus, cipher='aes256', passlen=32):
-    if not cipher in ciphers:
+    if cipher not in ciphers:
         raise CipherException(cipher)
     if passlen < 32:
         passlen = 32
     passphrase = crypto_string(passlen)
     temp = NamedTemporaryFile()
-    proc = subprocess.Popen(['openssl', 'genrsa', '-' + cipher, '-passout', 'pass:'+passphrase, '-out', temp.name, modulus], stdout=subprocess.PIPE)
+    proc = subprocess.Popen(['openssl',
+                             'genrsa',
+                             '-' + cipher,
+                             '-passout',
+                             'pass:' + passphrase,
+                             '-out',
+                             temp.name,
+                             modulus],
+                            stdout=subprocess.PIPE)
     (out, err) = proc.communicate()
     if err is not None:
         raise SubprocessException('private')
-    proc = subprocess.Popen(['openssl', 'rsa', '-in', temp.name, '-passin', 'pass:'+passphrase, '-outform', 'PEM', '-pubout'], stdout=subprocess.PIPE)
+    proc = subprocess.Popen(['openssl',
+                             'rsa',
+                             '-in',
+                             temp.name,
+                             '-passin',
+                             'pass:' + passphrase,
+                             '-outform',
+                             'PEM',
+                             '-pubout'],
+                            stdout=subprocess.PIPE)
     (out, err) = proc.communicate()
     if err is not None or len(out) < 5:
         raise SubprocessException('public')
@@ -46,19 +72,25 @@ def crypto_string(self, size):
     Random string
     """
     # http://stackoverflow.com/a/23728630/1993468
-    return ''.join(random.SystemRandom().choice(string.ascii_letters + string.digits) for _ in range(size))
+    return ''.join(random.SystemRandom().choice(
+        string.ascii_letters + string.digits) for _ in range(size))
 
 
 class CipherException(Exception):
+
     def __init__(self, value):
         self.value = str(value)
 
     def __repr__(self):
-        return repr('CipherExcpetion: ' + self.value + ' is not a valid cipher option.')
+        return repr('CipherExcpetion: ' + self.value +
+                    ' is not a valid cipher option.')
+
 
 class SubprocessException(Exception):
+
     def __init__(self, value):
         self.value = str(value)
 
     def __repr__(self):
-        return repr('SubprocessException: Error generating ' + self.value + ' RSA key!')
+        return repr('SubprocessException: Error generating ' +
+                    self.value + ' RSA key!')
