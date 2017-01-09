@@ -65,11 +65,9 @@ def crypto_string(self, size):
     Securely generate a random string of a specified length
     Can include uppercase or lowercase ASCII characters and/or integers
 
-    Keyword arguments:
-    length -- desired size of string
+    :param int size: desired length of string
 
-    Returns:
-    Random string
+    :returns: str
     """
     # http://stackoverflow.com/a/23728630/1993468
     return ''.join(random.SystemRandom().choice(

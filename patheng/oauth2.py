@@ -50,4 +50,12 @@ class OAuthAgent(object):
 
     @refresh
     def request(self, method, url, **kwargs):
+        r"""
+        Call `requests.request` internally using OAuth2Session
+
+        :param str method: 'POST', 'GET', etc.
+        :param str url: Endpoint
+        :params kwargs: Keyword arguments
+        :rtype: `requests.request`
+        """
         return self.oauth.request(method, url, **kwargs)

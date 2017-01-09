@@ -1,13 +1,13 @@
 import json
 import os
+from importlib import import_module
 
 
 def pinghost(host):
     """
     Ping target with a 1-second timeout limit
 
-    Returns:
-    response -- True if reached, otherwise False
+    :returns: True if reached, otherwise False
     """
     host = host.split(':')[0]  # leave off the port if exists
     # print "Pinging"
@@ -48,11 +48,23 @@ def generateconfig(filename, args, folder='./cfg'):
     """
     Generate a template configuration file in the `./cfg` folder
 
-    Keyword arguments:
-    filename -- target destination file
-    args -- a JSON of the sample configuration layout
+    :param str filename: target destination file
+    :param dict args: Sample configuration layout
     """
     if not os.path.isdir(folder):
         os.mkdir(folder)
     with open(folder + filename, 'w') as dc:
         json.dump(args, dc, indent=4, sort_keys=True)
+
+
+def load_plugin(fullmodule):
+    """
+    Helper for dynamic importing of modules
+
+    :param str fullmodule: Full module path in package, e.g.
+                           `patheng.oauth2.OAuthAgent`
+    :returns: module
+    """
+    package, module = fullmodule.rsplit('.', 1)
+    modpack = import_module(package)
+    return getattr(modpack, module)
