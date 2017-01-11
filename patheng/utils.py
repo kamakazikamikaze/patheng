@@ -65,6 +65,10 @@ def load_plugin(fullmodule):
                            `patheng.oauth2.OAuthAgent`
     :returns: module
     """
-    package, module = fullmodule.rsplit('.', 1)
-    modpack = import_module(package)
+    try:
+        package, module = fullmodule.rsplit('.', 1)
+        modpack = import_module(package)
+    except ValueError as e:
+        if 'need more than 1' in str(e):
+            return import_module(fullmodule)
     return getattr(modpack, module)
