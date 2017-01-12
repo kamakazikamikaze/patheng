@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='patheng',
-    version='0.3b',
+    version='0.3d',
     description='Standard Pathway Engineering automation tools',
 
     author='Kent Coble, Seth Lawlor',
