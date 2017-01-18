@@ -1,3 +1,5 @@
+from datetime import datetime
+from dateutil import tz
 import json
 import os
 from importlib import import_module
@@ -107,3 +109,22 @@ def allow_kwargs(func):
         some_args = dict((k, kwargs[k]) for k in argspec.args if k in kwargs)
         return func(*args, **some_args)
     return newfunc
+
+
+def tofrom_utc(timestamp, parseformat, from_utc=True):
+    """
+    Convert a timestamp to/from UTC time
+
+    :param str timestamp: Date/time to modify
+    :param str parseformat: Format of the timestamp to parse
+    :param bool from_utc: True if source stamp is UTC; otherwise False
+    :return: Converted timestamp
+    :rtype: str
+    """
+    utc_zone = tz.tzutc()
+    local_zone = tz.tzlocal()
+
+    time_obj = datetime.strptime(timestamp, parseformat)
+    new_time = time_obj.replace(tzinfo=(local_zone, utc_zone)[from_utc])
+    new_time = new_time.astimezone((utc_zone, local_zone)[from_utc])
+    return new_time.strftime(parseformat)
