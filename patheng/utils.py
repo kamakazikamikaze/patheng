@@ -1,10 +1,12 @@
+from binascii import hexlify, unhexlify
 from datetime import datetime
 from dateutil import tz
 import json
 import os
+import sys
 from importlib import import_module
 from inspect import getargspec
-from funtools import wraps
+from functools import wraps
 
 
 def pinghost(host):
@@ -128,3 +130,83 @@ def tofrom_utc(timestamp, parseformat, from_utc=True):
     new_time = time_obj.replace(tzinfo=(local_zone, utc_zone)[from_utc])
     new_time = new_time.astimezone((utc_zone, local_zone)[from_utc])
     return new_time.strftime(parseformat)
+
+if sys.version_info[0] == 2:
+    def to_option43(options):
+        '''
+        Create a hex-encoded string for DHCP Option 43
+
+        Key values should be the Sub-option numbers (int or str)
+
+        :param dict options: Sub-options and values
+        :return: Hex stream
+        :rtype: str
+        '''
+        def to_hex(option, content):
+            hexform = '{option}{length}{content}'
+            return hexform.format(**{
+                'option': hex(int(option))[2:].zfill(2).upper(),
+                'length': hex(len(content))[2:].zfill(2).upper(),
+                'content': str(hexlify(bytes(content))).upper()
+            })
+        return ''.join([to_hex(k, v) for k, v in options.iteritems()])
+
+    def from_option43(hexstream):
+        '''
+        Decode a hex string for DHCP Option 43
+
+        :param str hexstream: Hex-encoded option string
+
+        :return: Options and their values
+        :rtype: dict
+        '''
+        options = {}
+        stream = hexstream
+        while stream:
+            option = int(stream[0:2], 16)
+            length = int(stream[2:4], 16)
+            content = unhexlify(bytes(stream[4:(length * 2) + 4]))
+            stream = stream[(length * 2) + 4:]
+            options[option] = content
+        return options
+
+else:
+    def to_option43(options):
+        '''
+        Create a hex-encoded string for DHCP Option 43
+
+        Key values should be the Sub-option numbers (int or str)
+
+        :param dict options: Sub-options and values
+        :return: Hex stream
+        :rtype: str
+        '''
+        def to_hex(option, content):
+            hexform = '{option}{length}{content}'
+            return hexform.format(**{
+                'option': hex(int(option))[2:].zfill(2).upper(),
+                'length': hex(len(content))[2:].zfill(2).upper(),
+                'content': str(
+                    hexlify(bytes(content, 'utf-8')), 'utf-8').upper()
+            })
+        return ''.join([to_hex(k, v) for k, v in options.items()])
+
+    def from_option43(hexstream):
+        '''
+        Decode a hex string for DHCP Option 43
+
+        :param str hexstream: Hex-encoded option string
+
+        :return: Options and their values
+        :rtype: dict
+        '''
+        options = {}
+        stream = hexstream
+        while stream:
+            option = int(stream[0:2], 16)
+            length = int(stream[2:4], 16)
+            content = str(
+                unhexlify(bytes(stream[4:(length * 2) + 4], 'utf-8')), 'utf-8')
+            stream = stream[(length * 2) + 4:]
+            options[option] = content
+        return options
